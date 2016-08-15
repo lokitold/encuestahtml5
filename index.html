@@ -1,7 +1,55 @@
 <!DOCTYPE html>
 <html>
-<head><title> TypeScript types </title></head>
+<head>
+    <title>Event Source con HTML5</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="estilos.css">
+</head>
 <body>
-hi
+<div id="center">
+    <h1>EventSource con HTML5, Javascript y PHP en el servidor</h1>
+    <div class="divs si">si</div>
+    <div class="divs no">no</div>
+    <div class="status"></div>
+</div>
+<script>
+    if(!!window.EventSource)
+    {
+        //creamos un nuevo objeto EventSource y le decimos
+        //que el server está en survey.php
+        var server = new EventSource("survey.php");
+        //abrimos la conexión
+        server.onopen = function(e)
+        {
+            var status = document.querySelector(".status");
+            status.classList.toggle("online");
+            status.innerHTML = "<h3>Conectado</h3>";
+        }
+
+        //cuando ocurre un error con la conexión
+        server.onerror = function(e)
+        {
+            //si la conexión ha sido cerrada
+            if (e.readyState == EventSource.CLOSED)
+            {
+                var status = document.querySelector(".status");
+                status.classList.toggle("offline");
+                status.innerHTML = "<h3>Desconectado</h3>";
+            }
+        }
+
+        //añadimos el evento votaciones al server,
+        //así puede escuchar cada vez que el server mande información
+        server.addEventListener("votaciones", function(e)
+        {
+            var response = JSON.parse(e.data);
+            document.querySelector(".si")
+                    .innerHTML = response.si;
+            document.querySelector(".no")
+                    .innerHTML = response.no;
+
+        }, false);
+    }
+</script>
 </body>
 </html>
